@@ -7,10 +7,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Map;
 
 /**
  * 1.通道（Channel）:用于源节点与目标节点的连接，在Java NIO中负责缓冲区中数据的传输，Channel本身不存储数据，因此需要配合缓冲区进行数据传输。
@@ -41,7 +46,9 @@ import java.nio.file.StandardOpenOption;
  * 分散读取(Scattering Reads)：将通道中的数据分散到多个缓冲区中
  * 聚集写入(Gathering Writes)：将多个缓冲区中的数据聚集到一个通道中
  *
- *
+ * 4.字符集：Charset
+ *  编码：字符串—>字节数组
+ *  解码：字节数据—>字符串
  */
 public class TestChannel {
 
@@ -164,6 +171,52 @@ public class TestChannel {
         fileChannel2.write(bufs);
 
     }
+
+    @Test
+    public void test5() throws Exception{
+        Map<String, Charset> maps = Charset.availableCharsets();
+
+        maps.forEach((k,v)->{
+            System.out.println(k +":" + v);
+        });
+
+    }
+
+
+    @Test
+    public void test6() throws Exception{
+        Charset cs1 = Charset.forName("GBK");
+        //获取编码器
+        CharsetEncoder encoder = cs1.newEncoder();
+        //获取解码器
+        CharsetDecoder decoder = cs1.newDecoder();
+
+        CharBuffer cBuf = CharBuffer.allocate(1024);
+        cBuf.put("龙达科技");
+        cBuf.flip();
+
+        //编码
+        ByteBuffer bBuf = encoder.encode(cBuf);
+
+        for (int i = 0; i < 8; i++){
+            System.out.println(bBuf.get());
+        }
+
+        //解码
+        bBuf.flip();
+        CharBuffer cBuf2 = decoder.decode(bBuf);
+        System.out.println(cBuf2);
+
+    }
+
+
+
+
+
+
+
+
+
 
 
 
